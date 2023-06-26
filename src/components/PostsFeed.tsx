@@ -1,12 +1,14 @@
-import { type FC } from 'react';
-import { type PostWithAuthor } from '~/types';
+import Loading from './Loading';
 import Posts from './Posts';
+import { api } from '~/lib/api';
 
-interface PostsFeedProps {
-  data: PostWithAuthor[];
-}
+const PostsFeed = () => {
+  const { data, isLoading } = api.posts.getAll.useQuery();
 
-const PostsFeed: FC<PostsFeedProps> = ({ data }) => {
+  if (isLoading) return <Loading />;
+
+  if (!data) return <div>No posts retrieved</div>;
+
   return (
     <div className="flex flex-col">
       {data &&

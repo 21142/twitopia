@@ -1,6 +1,6 @@
 const Loading = () => {
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="flex h-[40vh] items-center justify-center">
       <div
         className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-[hsl(280,100%,70%)] motion-reduce:animate-[spin_1.5s_linear_infinite]"
         role="status"
