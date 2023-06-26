@@ -1,9 +1,6 @@
 import { type PostWithAuthor } from '~/types';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import Image from 'next/image';
-
-dayjs.extend(relativeTime);
+import { formatRelativeTimeFrom } from '~/lib/utils';
 
 const Posts = (props: PostWithAuthor) => {
   const { post, author } = props;
@@ -22,9 +19,9 @@ const Posts = (props: PostWithAuthor) => {
       <div className="flex flex-col">
         <div className="flex gap-1 text-xs font-medium text-slate-300">
           <span className="">{`@${author?.username}`}</span>
-          <span className="font-light">{`• ${dayjs(
+          <span className="font-light">{`• ${formatRelativeTimeFrom(
             post.createdAt
-          ).fromNow()}`}</span>
+          )}`}</span>
         </div>
         <span className="text-xl">{post?.content}</span>
       </div>

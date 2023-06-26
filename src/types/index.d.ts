@@ -1,3 +1,3 @@
-import { type RouterOutputs } from "~/utils/api";
+import { type RouterOutputs } from "~/lib/api";
 
 export type PostWithAuthor = RouterOutputs["posts"]["getAll"][number];

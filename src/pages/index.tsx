@@ -4,7 +4,7 @@ import CreatePost from '~/components/CreatePost';
 import Loading from '~/components/Loading';
 import Posts from '~/components/Posts';
 import PostsFeed from '~/components/PostsFeed';
-import { api } from '~/utils/api';
+import { api } from '~/lib/api';
 
 export default function Home() {
   const { user, isLoaded, isSignedIn } = useUser();
