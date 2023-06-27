@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { filterUserForClient } from "~/lib/utils";
 import { z } from "zod";
+import { ratelimit } from "~/lib/ratelimit";
 
 export const postsRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -34,10 +35,14 @@ export const postsRouter = createTRPCRouter({
   }),
 
   create: protectedProcedure.input(z.object({
-    content: z.string().emoji().min(1).max(280),
+    content: z.string().emoji("Only emojis are welcome").min(1).max(280),
     authorId: z.string()
   })).mutation(async ({ ctx, input }) => {
     const authorId = ctx.userId;
+
+    const { success } = await ratelimit.limit(authorId)
+    if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Rate limited" });
+
     const post = await ctx.prisma.post.create({
       data: {
         content: input.content,

@@ -1,18 +1,12 @@
-import { UserButton, useUser } from '@clerk/nextjs';
+import { UserButton } from '@clerk/nextjs';
 import Head from 'next/head';
 import Link from 'next/link';
-import CreatePost from '~/components/CreatePost';
-import PostsFeed from '~/components/PostsFeed';
 
-export default function Home() {
-  const { user, isSignedIn } = useUser();
-
-  if (!user) return null;
-
+export default function UserProfilePage() {
   return (
     <>
       <Head>
-        <title>Twitopia home</title>
+        <title>User profile</title>
         <meta
           name="description"
           content="Twitopia"
@@ -29,13 +23,11 @@ export default function Home() {
           </div>
           <Link href="/">
             <h1 className="py-6 text-center text-[5rem] font-extrabold tracking-tight">
-              Twit<span className="text-[hsl(280,100%,70%)]">opia</span>
+              <span className="text-[hsl(280,100%,70%)]">@macG</span>
+              <span> profile</span>
             </h1>
           </Link>
-          <div className="flex border-b border-slate-400 p-4">
-            {isSignedIn && <CreatePost />}
-          </div>
-          <PostsFeed />
+          <div className="flex border-b border-slate-400 p-4">@macg</div>
         </div>
       </main>
     </>
