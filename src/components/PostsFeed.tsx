@@ -3,7 +3,7 @@ import Posts from './Posts';
 import { api } from '~/lib/api';
 
 const PostsFeed = () => {
-  const { data, isLoading } = api.posts.getAll.useQuery();
+  const { data, isLoading } = api.post.getAll.useQuery();
 
   if (isLoading) return <Loading />;
 

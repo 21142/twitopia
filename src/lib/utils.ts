@@ -7,7 +7,7 @@ dayjs.extend(relativeTime);
 export const filterUserForClient = (user: User) => {
    return {
       id: user.id,
-      username: user.username ?? user.firstName?.concat(" ").concat(user.lastName ?? ""),
+      username: user.username ?? user.firstName?.concat(" ", user.lastName ?? ""),
       profileImageUrl: user.profileImageUrl,
    }
 };

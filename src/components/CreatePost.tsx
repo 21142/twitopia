@@ -12,9 +12,9 @@ const CreatePost = () => {
 
   if (!user) return null;
 
-  const postsContext = api.useContext().posts;
+  const postsContext = api.useContext().post;
 
-  const { mutate, isLoading } = api.posts.create.useMutation({
+  const { mutate, isLoading } = api.post.create.useMutation({
     onSuccess: () => {
       setInput('');
       void postsContext.invalidate();

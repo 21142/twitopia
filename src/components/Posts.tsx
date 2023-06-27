@@ -20,7 +20,7 @@ const Posts = (props: PostWithAuthor) => {
         />
         <div className="flex flex-col">
           <div className="flex gap-1 text-xs font-medium text-slate-300">
-            <Link href={`/@${author?.username}`}>
+            <Link href={`/${author?.id}`}>
               <span className="hover:cursor-pointer hover:text-[hsl(280,99%,70%)]">{`@${author?.username}`}</span>
             </Link>
             <span className="font-light">{`• ${formatRelativeTimeFrom(

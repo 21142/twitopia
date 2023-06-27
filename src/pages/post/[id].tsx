@@ -1,12 +1,31 @@
-import { UserButton } from '@clerk/nextjs';
+import { TRPCError } from '@trpc/server';
+import {
+  type GetStaticPropsContext,
+  type GetStaticPaths,
+  type InferGetStaticPropsType,
+  type NextPage,
+} from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
+import PageLayout from '~/components/PageLayout';
+import { api } from '~/lib/api';
+import { prisma } from '~/lib/db';
+import { ssghelpers } from '~/lib/ssg';
 
-export default function PostPage() {
+type PageProps = InferGetStaticPropsType<typeof getStaticProps>;
+
+const PostPage: NextPage<PageProps> = ({ id }) => {
+  const { data, isLoading } = api.post.getPostById.useQuery({ id });
+
+  if (isLoading) {
+    console.log('POST DATA LOADING!!!');
+  }
+
+  if (!data) return <div>No post retrieved</div>;
+
   return (
     <>
       <Head>
-        <title>Post</title>
+        <title>{data.content}</title>
         <meta
           name="description"
           content="Twitopia"
@@ -16,19 +35,51 @@ export default function PostPage() {
           href="/favicon.ico"
         />
       </Head>
-      <main className="flex h-screen justify-center">
-        <div className="h-full w-full border-zinc-100 py-4 md:max-w-2xl md:border-x">
-          <div className="flex justify-end px-5">
-            <UserButton afterSignOutUrl="/" />
-          </div>
-          <Link href="/">
-            <h1 className="py-6 text-center text-[5rem] font-extrabold tracking-tight">
-              Twit<span className="text-[hsl(280,100%,70%)]">opia</span>
-            </h1>
-          </Link>
-          <div className="flex border-b border-slate-400 p-4"></div>
+      <PageLayout>
+        <div className="flex justify-center p-4 text-[3rem]">
+          {data.content}
         </div>
-      </main>
+      </PageLayout>
     </>
   );
+};
+
+export default PostPage;
+
+export async function getStaticProps(context: GetStaticPropsContext) {
+  const id = context.params?.id as string;
+  if (!id)
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'Post not found for id',
+    });
+
+  await ssghelpers.post.getPostById.prefetch({ id });
+
+  return {
+    props: {
+      trpcState: ssghelpers.dehydrate(),
+      id,
+    },
+    revalidate: 1,
+  };
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await prisma.post.findMany({
+    select: {
+      id: true,
+    },
+  });
+
+  if (!posts) return { paths: [], fallback: 'blocking' };
+
+  return {
+    paths: posts.map((post) => ({
+      params: {
+        id: post.id,
+      },
+    })),
+    fallback: 'blocking',
+  };
+};

@@ -1,12 +1,26 @@
-import { UserButton } from '@clerk/nextjs';
+import { clerkClient } from '@clerk/nextjs';
+import { TRPCError } from '@trpc/server';
+import {
+  type InferGetStaticPropsType,
+  type GetStaticPaths,
+  type GetStaticPropsContext,
+  type NextPage,
+} from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
+import PageLayout from '~/components/PageLayout';
+import { api } from '~/lib/api';
+import { ssghelpers } from '~/lib/ssg';
 
-export default function UserProfilePage() {
+type PageProps = InferGetStaticPropsType<typeof getStaticProps>;
+
+const UserProfilePage: NextPage<PageProps> = ({ userId }) => {
+  const { data } = api.profile.getUserById.useQuery({ id: userId });
+
+  if (!data) return <div>No user retrieved</div>;
   return (
     <>
       <Head>
-        <title>User profile</title>
+        <title>{data.username}</title>
         <meta
           name="description"
           content="Twitopia"
@@ -16,20 +30,43 @@ export default function UserProfilePage() {
           href="/favicon.ico"
         />
       </Head>
-      <main className="flex h-screen justify-center">
-        <div className="h-full w-full border-zinc-100 py-4 md:max-w-2xl md:border-x">
-          <div className="flex justify-end px-5">
-            <UserButton afterSignOutUrl="/" />
-          </div>
-          <Link href="/">
-            <h1 className="py-6 text-center text-[5rem] font-extrabold tracking-tight">
-              <span className="text-[hsl(280,100%,70%)]">@macG</span>
-              <span> profile</span>
-            </h1>
-          </Link>
-          <div className="flex border-b border-slate-400 p-4">@macg</div>
+      <PageLayout>
+        <div className="flex border-b border-slate-400 p-4 text-[hsl(280,99%,70%)]">
+          @{data.username ?? ''}
         </div>
-      </main>
+      </PageLayout>
     </>
   );
+};
+
+export default UserProfilePage;
+
+export async function getStaticProps(context: GetStaticPropsContext) {
+  const userId = context.params?.slug as string;
+  if (!userId)
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'User not found for id',
+    });
+
+  await ssghelpers.profile.getUserById.prefetch({ id: userId });
+  return {
+    props: {
+      trpcState: ssghelpers.dehydrate(),
+      userId,
+    },
+    revalidate: 1,
+  };
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const users = await clerkClient.users.getUserList();
+  return {
+    paths: users.map((user) => ({
+      params: {
+        slug: user.id,
+      },
+    })),
+    fallback: 'blocking',
+  };
+};

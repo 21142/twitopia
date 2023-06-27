@@ -5,7 +5,7 @@ import { filterUserForClient } from "~/lib/utils";
 import { z } from "zod";
 import { ratelimit } from "~/lib/ratelimit";
 
-export const postsRouter = createTRPCRouter({
+export const postRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.prisma.post.findMany({
       take: 100,
@@ -34,6 +34,20 @@ export const postsRouter = createTRPCRouter({
     });
   }),
 
+  getPostById: publicProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {
+    const post = await ctx.prisma.post.findUnique({
+      where: {
+        id: input.id
+      }
+    })
+
+    if (!post) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Post not found" })
+    }
+
+    return post;
+  }),
+
   create: protectedProcedure.input(z.object({
     content: z.string().emoji("Only emojis are welcome").min(1).max(280),
     authorId: z.string()
@@ -51,5 +65,5 @@ export const postsRouter = createTRPCRouter({
     });
 
     return post;
-  }),
+  })
 });
