@@ -1,7 +1,6 @@
 name: Typescript Type Check, Prettier and ESLint
 
-on:
-  pull_request:
+on: [push, pull_request]
 
 env:
    DATABASE_URL: "fake"
