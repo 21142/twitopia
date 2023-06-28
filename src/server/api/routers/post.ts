@@ -1,7 +1,7 @@
 import { clerkClient } from "@clerk/nextjs";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
-import { filterUserForClient } from "~/lib/utils";
+import { addUserDataToPost, filterUserForClient } from "~/lib/utils";
 import { z } from "zod";
 import { ratelimit } from "~/lib/ratelimit";
 
@@ -42,10 +42,28 @@ export const postRouter = createTRPCRouter({
     })
 
     if (!post) {
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Post not found" })
+      throw new TRPCError({ code: "NOT_FOUND", message: "Post not found" })
     }
 
-    return post;
+    return (await addUserDataToPost([post]))[0];
+  }),
+
+  getPostsByUserId: publicProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
+    const posts = await ctx.prisma.post.findMany({
+      where: {
+        authorId: input.userId
+      },
+      take: 100,
+      orderBy: {
+        createdAt: "desc"
+      }
+    })
+
+    if (!posts) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Posts not found" })
+    }
+
+    return addUserDataToPost(posts);
   }),
 
   create: protectedProcedure.input(z.object({

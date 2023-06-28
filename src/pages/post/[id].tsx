@@ -7,6 +7,7 @@ import {
 } from 'next';
 import Head from 'next/head';
 import PageLayout from '~/components/PageLayout';
+import Posts from '~/components/Posts';
 import { api } from '~/lib/api';
 import { prisma } from '~/lib/db';
 import { ssghelpers } from '~/lib/ssg';
@@ -25,7 +26,7 @@ const PostPage: NextPage<PageProps> = ({ id }) => {
   return (
     <>
       <Head>
-        <title>{data.content}</title>
+        <title>{`${data.post.content} • ${data.author.username}`}</title>
         <meta
           name="description"
           content="Twitopia"
@@ -37,8 +38,9 @@ const PostPage: NextPage<PageProps> = ({ id }) => {
       </Head>
       <PageLayout>
         <div className="flex justify-center p-4 text-[3rem]">
-          {data.content}
+          {data.post.content}
         </div>
+        <Posts {...data} />
       </PageLayout>
     </>
   );

@@ -10,6 +10,8 @@ import Head from 'next/head';
 import PageLayout from '~/components/PageLayout';
 import { api } from '~/lib/api';
 import { ssghelpers } from '~/lib/ssg';
+import Image from 'next/image';
+import UserFeed from '~/components/UserFeed';
 
 type PageProps = InferGetStaticPropsType<typeof getStaticProps>;
 
@@ -30,10 +32,22 @@ const UserProfilePage: NextPage<PageProps> = ({ userId }) => {
           href="/favicon.ico"
         />
       </Head>
-      <PageLayout>
-        <div className="flex border-b border-slate-400 p-4 text-[hsl(280,99%,70%)]">
-          @{data.username ?? ''}
+      <PageLayout className="bg-zinc-900">
+        <div className="relative h-24 bg-zinc-900 p-4 text-[hsl(280,99%,70%)]">
+          <Image
+            src={data.profileImageUrl}
+            className="border-full absolute bottom-0 left-0 -mb-[48px] ml-4 rounded-full border-4 border-black"
+            width={128}
+            height={128}
+            alt={`${data.username ?? ''}'s profile picture`}
+          />
         </div>
+        <div className="h-[64px]" />
+        <div className="p-4 text-2xl font-bold">{`@${
+          data.username ?? data.externalUsername ?? ''
+        }`}</div>
+        <div className="w-full border-b border-slate-400" />
+        <UserFeed userId={data.id} />
       </PageLayout>
     </>
   );
