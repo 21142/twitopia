@@ -5,7 +5,7 @@ on: [push, pull_request]
 env:
    DATABASE_URL: "https://fake.com"
    CLERK_SECRET_KEY: "fake"
-   UPSTASH_REDIS_REST_URL: "fake"
+   UPSTASH_REDIS_REST_URL: "https://fake.com"
    UPSTASH_REDIS_REST_TOKEN: "fake"
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "fake"
 
